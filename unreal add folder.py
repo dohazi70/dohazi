@@ -7,13 +7,15 @@ project_directory = unreal.Paths.project_dir()
 # "Content" 폴더의 경로 생성
 content_folder_path = os.path.join(project_directory, "Content")
 
-# 새 폴더 이름 정의
-new_folder_name = "MyNewFolder"
+# "asset" 폴더 경로 생성
+asset_folder_path = os.path.join(content_folder_path, "asset")
 
-# 새 폴더 경로 생성
-new_folder_path = os.path.join(content_folder_path, new_folder_name)
+# "char" 폴더 경로 생성
+char_folder_path = os.path.join(asset_folder_path, "char")
 
-# 새 폴더 생성
-os.makedirs(new_folder_path)
+# "props" 폴더 경로 생성
+props_folder_path = os.path.join(asset_folder_path, "props")
 
-print(f"새 폴더가 {new_folder_path} 경로에 생성되었습니다.")
+# 각 폴더 생성
+os.makedirs(char_folder_path)
+os.makedirs(props_folder_path)
