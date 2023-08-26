@@ -18,8 +18,8 @@ materialfunction_path = os.path.join(mastermaterial_path, "function")
 Utility_path = os.path.join(project_content_path, "Utility")
 
 #seq
-shot_name = input("shot name: ")
-shot_count = int(input("shot index: "))
+shot_name = "sot"
+shot_count = int(20)
 shot_folder_path = os.path.join(project_content_path, "Shots")
 shot_lv_folder_path = os.path.join(shot_folder_path, "Shot_LV")
 os.makedirs(shot_folder_path, exist_ok=True)
@@ -36,10 +36,19 @@ for i in range(1, shot_count + 1):
     os.makedirs(shot_path)
     for j, level_name in enumerate(level_names):
         full_level_name = f"{shot_name}_{i}_{level_suffixes[j]}"
+        print("full_level_name: " + full_level_name)
         full_level_path = os.path.join(shot_path, full_level_name)
+        print("full_level_name: " + full_level_path)
+
+        content_index = full_level_path.find("Content")
+        if content_index != -1:
+            unreal_path = "/Game" + full_level_path[content_index + len("Content"):].replace("\\", "/")
+            print(unreal_path)
+        else:
+            print("invalid input path")
         
         level_factory = unreal.EditorLevelLibrary
-        level = level_factory.new_level(full_level_path, full_level_name, unreal.LevelStreamingType.LS_LoadOnDemand)
+        makeleve = level_factory.new_level(unreal_path.format())
 
 
 
@@ -61,5 +70,3 @@ os.makedirs(nft_path)
 os.makedirs(materialfunction_path)
 os.makedirs(Utility_path)
 os.makedirs(movies_path)
-
-
