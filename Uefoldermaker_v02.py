@@ -17,7 +17,7 @@ materialfunction_path = os.path.join(mastermaterial_path, "function")
 #blueprint
 Utility_path = os.path.join(project_content_path, "Utility")
 
-#seq
+#shots
 shot_name = "sot"
 shot_count = int(20)
 shot_folder_path = os.path.join(project_content_path, "Shots")
@@ -50,7 +50,22 @@ for i in range(1, shot_count + 1):
         level_factory = unreal.EditorLevelLibrary
         makeleve = level_factory.new_level(unreal_path.format())
 
+## 서브레벨 등록
 
+main_level_path = "/Game/main"
+target_level_path = "/Game/Maps/"
+
+unreal.EditorLoadingAndSavingUtils.load_map(main_level_path)
+
+world = unreal.EditorLevelLibrary.get_editor_world()
+level_asset_data = unreal.EditorAssetLibrary.list_assets(target_level_path, recursive=True, include_folder=True)
+level_asset_data_len = len(level_asset_data)
+
+for i in range(level_asset_data_len):
+    arry_level_path = level_asset_data[i]
+    unreal.EditorLevelUtils.add_level_to_world(world, arry_level_path, unreal.LevelStreamingAlwaysLoaded)
+
+unreal.EditorLevelLibrary.save_current_level()
 
 
 for i in range(1, shot_count + 1):
