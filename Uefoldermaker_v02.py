@@ -1,6 +1,8 @@
 import unreal
 import os
 
+dohan = "geti test"
+
 project_content_path = unreal.Paths.project_content_dir( )
 
 # asset
