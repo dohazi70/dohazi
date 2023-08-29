@@ -4,6 +4,9 @@ import os
 # 프로젝트 컨텐츠 경로 가져오기
 project_content_path = unreal.Paths.project_content_dir()
 
+tset = "test"
+
+
 # 각종 경로 설정
 asset_path = os.path.join(project_content_path, "asset")
 char_path = os.path.join(asset_path, "char")
