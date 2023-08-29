@@ -62,7 +62,7 @@ for i in range(1, shot_count + 1):
 ## 서브레벨 등록
 
 main_level_path = "/Game/main"
-target_level_path = "/Game/Maps/"
+target_level_path = "/Game/Shots/Shot_LV/"
 
 unreal.EditorLoadingAndSavingUtils.load_map(main_level_path)
 
@@ -98,3 +98,4 @@ os.makedirs(movies_path)
 os.makedirs(dh_path)
 os.makedirs(jb_path)
 os.makedirs(yy_path)
+
