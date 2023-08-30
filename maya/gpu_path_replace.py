@@ -11,7 +11,8 @@ def replace_cache_paths():
             cache_path = cmds.getAttr(node + ".cacheFileName")
             modified_path = cache_path.replace(find_text, replace_text)
             cmds.setAttr(node + ".cacheFileName", modified_path, type="string")
-    
+
+#pyside 
 app = QtWidgets.QApplication.instance()
 if not app:
     app = QtWidgets.QApplication([])
