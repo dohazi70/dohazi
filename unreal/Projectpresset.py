@@ -5,10 +5,10 @@ import os
 project_content_path = unreal.Paths.project_content_dir()
 
 # 각종 경로 설정
-asset_path = os.path.join(project_content_path, "asset")
-char_path = os.path.join(asset_path, "char")
-props_path = os.path.join(asset_path, "props")
-building_path = os.path.join(asset_path, "building")
+asset_path = os.path.join(project_content_path, "Asset")
+char_path = os.path.join(asset_path, "Char")
+props_path = os.path.join(asset_path, "Props")
+building_path = os.path.join(asset_path, "Building")
 nft_path = os.path.join(asset_path, "NFT")
 mastermaterial_path = os.path.join(project_content_path, "MasterMaterial")
 materialfunction_path = os.path.join(mastermaterial_path, "function")
@@ -46,7 +46,7 @@ create_directory(shot_folder_path)
 
 # 레벨 제작
 shot_name = "sot"
-shot_count = 20
+shot_count = 2
 
 #os.makedirs(shot_folder_path, exist_ok=True)
 
@@ -84,7 +84,14 @@ for i in range(1, shot_count + 1):
     level_sequence = unreal.AssetTools.create_asset(asset_tools, asset_name = f"{shot_name}_{i:03d}", package_path = "/Game/Shots/", asset_class = unreal.LevelSequence, factory = unreal.LevelSequenceFactoryNew())
     frame_rate = unreal.FrameRate(numerator = 24, denominator = 1)
     level_sequence.set_display_rate(frame_rate)
-
-
-
-
+    target_level_path2 = "/Game/Shots/Shot_LV/" + f"{shot_name}_{i:03d}/"
+    print(target_level_path2)
+    level_asset_data2 = unreal.EditorAssetLibrary.list_assets(target_level_path2, recursive=True, include_folder=True)
+    for arry_level_path in level_asset_data2:
+            if os.path.basename(arry_level_path):
+                filename, _ = os.path.splitext(os.path.basename(arry_level_path))
+                print("path:" + filename)  # 파일만 출력
+                level_visibility_track = level_sequence.add_master_track(unreal.MovieSceneLevelVisibilityTrack)
+                level_visibility_section = level_visibility_track.add_section()
+                level_visibility_section.set_range(0, 150)
+                level_visibility_section.set_level_names([filename])
