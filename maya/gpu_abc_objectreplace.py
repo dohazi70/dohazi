@@ -1,21 +1,52 @@
 import maya.cmds as cmds
 from PySide2 import QtWidgets
 
-def get_user_search_text():
-    # 대화 상자 생성
-    dialog = QtWidgets.QInputDialog()
-    dialog.setWindowTitle("Search Text")
-    dialog.setLabelText("Enter search text:")
-    dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
-    dialog.setTextValue("")
+class SearchAndPathDialog(QtWidgets.QDialog):
+    def __init__(self):
+        super(SearchAndPathDialog, self).__init__()
 
-    if dialog.exec_():
-        search_text = dialog.textValue()
-        return search_text
+        self.setWindowTitle("Search Text and Directory Path")
+        self.setMinimumWidth(400)
+
+        layout = QtWidgets.QVBoxLayout()
+
+        search_layout = QtWidgets.QHBoxLayout()
+        search_label = QtWidgets.QLabel("Enter search text:")
+        self.search_line_edit = QtWidgets.QLineEdit()
+        search_layout.addWidget(search_label)
+        search_layout.addWidget(self.search_line_edit)
+        layout.addLayout(search_layout)
+
+        path_layout = QtWidgets.QHBoxLayout()
+        path_label = QtWidgets.QLabel("Enter directory path:")
+        self.path_line_edit = QtWidgets.QLineEdit()
+        path_layout.addWidget(path_label)
+        path_layout.addWidget(self.path_line_edit)
+        layout.addLayout(path_layout)
+
+        button = QtWidgets.QPushButton("OK")
+        button.clicked.connect(self.on_ok_button_clicked)
+        layout.addWidget(button)
+
+        self.setLayout(layout)
+
+    def on_ok_button_clicked(self):
+        search_text = self.search_line_edit.text()
+        directory_path = self.path_line_edit.text()
+        self.accept()
+
+def get_user_input():
+    dialog = SearchAndPathDialog()
+    result = dialog.exec_()
+
+    if result == QtWidgets.QDialog.Accepted:
+        search_text = dialog.search_line_edit.text()
+        directory_path = dialog.path_line_edit.text()
+        return search_text, directory_path
     else:
-        return None
+        return None, None
 
-search_text = get_user_search_text()
+search_text, directory_path = get_user_input()
 
 def import_abc_files_in_directory(directory_path, search_text):
     abc_cache_nodes = []
@@ -55,9 +86,8 @@ def select_nodes_with_error(node_names):
     
     return selected_nodes
 
-if search_text is not None:
+if search_text is not None and directory_path is not None:
     gpu_cache_nodes = cmds.ls(type="gpuCache")
-    directory_path = r"\\10.0.40.42\user\gen\projects\KFA"
     abc_cache_nodes = import_abc_files_in_directory(directory_path, search_text)
     print(f"Found ABC Cache Nodes: {abc_cache_nodes}")
     
