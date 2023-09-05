@@ -5,37 +5,71 @@ def get_user_search_text():
     # 대화 상자 생성
     dialog = QtWidgets.QInputDialog()
     dialog.setWindowTitle("Search Text")
-    dialog.setLabelText("Enter search text:")  # 사용자에게 입력할 텍스트를 입력하라는 메시지
+    dialog.setLabelText("Enter search text:")
     dialog.setInputMode(QtWidgets.QInputDialog.TextInput)
-    dialog.setTextValue("")  # 초기 값 설정
+    dialog.setTextValue("")
 
-    # 대화 상자를 표시하고 사용자 입력 받기
     if dialog.exec_():
-        search_text = dialog.textValue()  # 사용자가 입력한 텍스트 가져오기
+        search_text = dialog.textValue()
         return search_text
     else:
         return None
 
-# 사용자로부터 검색 텍스트 받기
 search_text = get_user_search_text()
 
+def import_abc_files_in_directory(directory_path, search_text):
+    abc_cache_nodes = []
+    
+    for root, dirs, files in os.walk(directory_path):
+        for file in files:
+            if file.endswith(".abc") and search_text in file:
+                abc_file_path = os.path.join(root, file)
+                print(f"Importing ABC file: {abc_file_path}")
+                
+                cmds.AbcImport(abc_file_path, mode="import")
+                
+                abc_cache_nodes.append(file)
+    
+    return abc_cache_nodes
+
+def pad_numbers(text):
+    import re
+    def replace(match):
+        number = match.group(0)
+        return f'{int(number):02d}'
+    return re.sub(r'\d+', replace, text)
+
+def select_nodes_with_error(node_names):
+    selected_nodes = []
+    for node_name in node_names:
+        try:
+            cmds.select(node_name, add=True)
+            selected_nodes.append(node_name)
+        except:
+            corrected_node_name = "|" + node_name
+            try:
+                cmds.select(corrected_node_name, add=True)
+                selected_nodes.append(corrected_node_name)
+            except:
+                cmds.warning(f"Unable to select node: {node_name}")
+    
+    return selected_nodes
+
 if search_text is not None:
-    # GPU 캐시 노드 목록 가져오기
     gpu_cache_nodes = cmds.ls(type="gpuCache")
-    abc_cache_nodes = cmds.ls(type="mesh")
+    directory_path = r"\\10.0.40.42\user\gen\projects\KFA"
+    abc_cache_nodes = import_abc_files_in_directory(directory_path, search_text)
+    print(f"Found ABC Cache Nodes: {abc_cache_nodes}")
+    
+    selected_gpu_cache_nodes = [pad_numbers(node) for node in gpu_cache_nodes if search_text in node]
+    selected_abc_cache_nodes = [pad_numbers(node) for node in abc_cache_nodes if search_text in node]
 
-    # 사용자가 입력한 텍스트로 필터링하여 노드 선택
-    selected_gpu_cache_nodes = [node for node in gpu_cache_nodes if search_text in node]
-    selected_abc_cache_nodes = [node for node in abc_cache_nodes if search_text in node]
-
-    # Shape를 없애줌
     selected_gpu_cache_nodes = [node.replace("Shape", "") for node in selected_gpu_cache_nodes]
-    selected_abc_cache_nodes = [node.replace("Shape", "") for node in selected_abc_cache_nodes]
-
-    # GPU 캐시 노드 선택
+    print(selected_gpu_cache_nodes)
+    selected_abc_cache_nodes = [node.replace("Shape", "").replace(".abc", "") for node in selected_abc_cache_nodes]
+    print(selected_abc_cache_nodes)
+    
     cmds.select(selected_gpu_cache_nodes)
-
-    # ABC 캐시 노드 선택 (add=True를 사용하여 추가 선택)
-    cmds.select(selected_abc_cache_nodes, add=True)
-
+    selected_nodes = select_nodes_with_error(selected_abc_cache_nodes)
+    
     cmds.ReplaceObjects()
