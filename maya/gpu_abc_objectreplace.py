@@ -103,3 +103,4 @@ if search_text is not None and directory_path is not None:
     selected_nodes = select_nodes_with_error(selected_abc_cache_nodes)
     
     cmds.ReplaceObjects()
+    cmds.delete(selected_abc_cache_nodes)
