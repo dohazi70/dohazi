@@ -1,9 +1,61 @@
 import os
-import unreal
+from PySide2 import QtWidgets, QtGui, QtCore
 
-folder_path = "D:\dev\UnrealEngine\MV_richman\Saved\MovieRenders\v02\S_015\MASTER"
 
-file_list = os.listdir(folder_path)
+def replace():
+    input_path = find_line.text()
+    input_verison = replace_line.text()
+    parts = input_path.split("\\")
+    desired_part = "\\".join(parts[-2:])
+    master_path = desired_part.replace("\\", "_")
 
-for file_name in file_list:
-    print(file_name)
+    file_list = os.listdir(input_path)
+    print(file_list)
+
+    prefix = master_path + "_" + input_verison + "_"
+    start_number = 0
+
+    for file_name in file_list:
+        file_path = os.path.join(input_path, file_name)
+        file_extension = os.path.splitext(file_name)[-1]
+        
+        new_file_name = f"{prefix}{start_number:03d}{file_extension}"
+        new_file_path = os.path.join(input_path, new_file_name)
+        
+        os.rename(file_path, new_file_path)
+        start_number += 1
+
+
+app = QtWidgets.QApplication.instance()
+if not app:
+    app = QtWidgets.QApplication([])
+
+window = QtWidgets.QWidget()
+window.setWindowTitle("seq file repalce:")
+window.setMinimumWidth(400)
+
+layout = QtWidgets.QVBoxLayout()
+
+find_layout = QtWidgets.QHBoxLayout()
+find_label = QtWidgets.QLabel("file path:")
+find_layout.addWidget(find_label)
+find_line = QtWidgets.QLineEdit()
+find_layout.addWidget(find_line)
+layout.addLayout(find_layout)
+
+replace_layout = QtWidgets.QHBoxLayout()
+replace_label = QtWidgets.QLabel("verison:")
+replace_layout.addWidget(replace_label)
+replace_line = QtWidgets.QLineEdit()
+replace_layout.addWidget(replace_line)
+layout.addLayout(replace_layout)
+
+button = QtWidgets.QPushButton("Replace")
+button.clicked.connect(replace)
+layout.addWidget(button)
+
+window.setLayout(layout)
+window.show()
+
+app.exec_()
+
