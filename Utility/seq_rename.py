@@ -22,7 +22,7 @@ def replace():
         new_file_path = os.path.join(input_path, new_file_name)
         
         os.rename(file_path, new_file_path)
-        start_number += 1
+        start_number += 1001
 
 
 
