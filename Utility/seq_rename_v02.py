@@ -9,9 +9,17 @@ master_path_name = desired_part.replace("\\", "_")
 print(master_path_name)
 
 file_list = os.listdir(input_path)
+prefix = master_path_name + "_"
 
 for file_name in file_list:
-    file_name_path = file_name.split("_")
-    file_desired_path = "_".join(file_name_path[-3:])
-    print(file_desired_path)
+    file_path = os.path.join(input_path, file_name)
+    file_name_path = file_name.split(".")
+    file_desired_path = ".".join(file_name_path[-2:])
+    
+    new_file_name = f"{prefix}{file_desired_path}"
+    new_file_name_path = os.path.join(input_path, new_file_name)
+    os.rename(file_path, new_file_name_path) 
+    
+    
+    print(new_file_name_path)
 
