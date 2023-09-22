@@ -11,17 +11,17 @@ def replace():
     file_list = os.listdir(input_path)
 
     prefix = master_path + "_"
-    start_number = 1001
 
     for file_name in file_list:
         file_path = os.path.join(input_path, file_name)
-        file_extension = os.path.splitext(file_name)[-2]
+        file_name_path = file_name.split(".")
+        file_desired_path = ".".join(file_name_path[-2:])
         
-        new_file_name = f"{prefix}{start_number:04d}{file_extension}"
-        new_file_path = os.path.join(input_path, new_file_name)
+        new_file_name = f"{prefix}{file_desired_path}"
+        new_file_name_path = os.path.join(input_path, new_file_name)
+        os.rename(file_path, new_file_name_path) 
         
-        os.rename(file_path, new_file_path)
-        start_number += 1
+        print(new_file_name_path)
 
 
 
