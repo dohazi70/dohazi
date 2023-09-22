@@ -11,5 +11,7 @@ print(master_path_name)
 file_list = os.listdir(input_path)
 
 for file_name in file_list:
-    print(file_name)
+    file_name_path = file_name.split("_")
+    file_desired_path = "_".join(file_name_path[-3:])
+    print(file_desired_path)
 
