@@ -9,20 +9,19 @@ def replace():
     master_path = desired_part.replace("\\", "_")
 
     file_list = os.listdir(input_path)
-    print(file_list)
 
     prefix = master_path + "_"
-    start_number = 0
+    start_number = 1001
 
     for file_name in file_list:
         file_path = os.path.join(input_path, file_name)
-        file_extension = os.path.splitext(file_name)[-1]
+        file_extension = os.path.splitext(file_name)[-2]
         
         new_file_name = f"{prefix}{start_number:04d}{file_extension}"
         new_file_path = os.path.join(input_path, new_file_name)
         
         os.rename(file_path, new_file_path)
-        start_number += 1001
+        start_number += 1
 
 
 
