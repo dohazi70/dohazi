@@ -20,8 +20,6 @@ def replace():
         new_file_name = f"{prefix}{file_desired_path}"
         new_file_name_path = os.path.join(input_path, new_file_name)
         os.rename(file_path, new_file_name_path) 
-        
-        print(new_file_name_path)
 
 
 
