@@ -1,5 +1,5 @@
 import os
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide2 import QtWidgets
 
 def update_new_name():
     input_path = find_line.text()
