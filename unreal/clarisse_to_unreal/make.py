@@ -65,3 +65,16 @@ def import_unreal_usd():
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
 
 import_unreal_usd()
+
+#import usd stage actor
+import unreal
+
+usd_class = unreal.UsdStageActor
+editor_actor_subsystem = unreal.EditorActorSubsystem()
+path = r"D:/test.usd"
+
+spawn_location = unreal.Vector(0.0, 0.0, 0.0)
+spawn_rotation = unreal.Rotator(0.0, 0.0, 0.0)
+
+spawned_actor = editor_actor_subsystem.spawn_actor_from_class(usd_class, spawn_location, spawn_rotation)
+spawned_actor.set_root_layer(path)
