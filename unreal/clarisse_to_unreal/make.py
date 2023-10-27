@@ -60,7 +60,6 @@ def import_unreal_usd():
     task = unreal.AssetImportTask()
     task.set_editor_property("filename", r"\\10.0.40.42\virtual\unreal_projects\Hero\Bridge\clarisse\USD_test\xhouse.usd")
     task.set_editor_property("destination_path", "/Game/Content/xhouse")
-    unreal.UsdStageImportOptions.import_actors(True)
     factory.asset_import_task = task
 
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
