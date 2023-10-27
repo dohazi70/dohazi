@@ -39,7 +39,8 @@ def clarisse_TextureMapFile_data():
     else:
         positions = None
 
-def import_texture_task():
+# import texture
+def import_unreal_texture():
 
     import_task = unreal.AssetImportTask()
     import_task.filename = r"D:\Data\snow_with_tall_grass_diffuse.jpg"
@@ -47,7 +48,21 @@ def import_texture_task():
     import_task.destination_name = 'snow_with_tall_grass_diffuse'
     import_task.options = None # https://docs.unrealengine.com/5.3/en-US/PythonAPI/class/AssetImportTask.html#unreal.AssetImportTask
 
-    result = unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([import_task])
+    result = unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([import_task]) 
 
 
- 
+# import usd
+import unreal 
+from unreal import UsdStageImportFactory as usd_factory
+
+def import_unreal_usd():
+    factory = usd_factory()
+    task = unreal.AssetImportTask()
+    task.set_editor_property("filename", r"\\10.0.40.42\virtual\unreal_projects\Hero\Bridge\clarisse\USD_test\xhouse.usd")
+    task.set_editor_property("destination_path", "/Game/Content/xhouse")
+    unreal.UsdStageImportOptions.import_actors(True)
+    factory.asset_import_task = task
+
+    unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
+
+import_unreal_usd()
