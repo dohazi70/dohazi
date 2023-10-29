@@ -1,3 +1,40 @@
+## usd ##
+ 
+# import usd
+import unreal 
+from unreal import UsdStageImportFactory as usd_factory
+
+def import_unreal_usd():
+    factory = usd_factory()
+    task = unreal.AssetImportTask()
+    task.set_editor_property("filename", r"\\10.0.40.42\virtual\unreal_projects\Hero\Bridge\clarisse\USD_test\xhouse.usd")
+    task.set_editor_property("destination_path", "/Game/Content/xhouse")
+    task.set_editor_property("automated", True)
+    factory.asset_import_task = task
+
+    unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
+
+import_unreal_usd()
+
+#import usd stage actor
+import unreal
+
+def import_unreal_usdStage():
+    usd_class = unreal.UsdStageActor
+    editor_actor_subsystem = unreal.EditorActorSubsystem()
+
+    path = r"D:/test.usd" # usd stage root_layer path
+    usd_stage_label = "test" # usd stage actor name
+
+    spawn_location = unreal.Vector(0.0, 0.0, 0.0)
+    spawn_rotation = unreal.Rotator(0.0, 0.0, 0.0)
+    spawned_actor = editor_actor_subsystem.spawn_actor_from_class(usd_class, spawn_location, spawn_rotation)
+
+    spawned_actor.set_actor_label(usd_stage_label)
+    spawned_actor.set_root_layer(path)
+
+
+## material ##
 import unreal
 import re
 
@@ -49,32 +86,3 @@ def import_unreal_texture():
     import_task.options = None # https://docs.unrealengine.com/5.3/en-US/PythonAPI/class/AssetImportTask.html#unreal.AssetImportTask
 
     result = unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([import_task]) 
-
-
-# import usd
-import unreal 
-from unreal import UsdStageImportFactory as usd_factory
-
-def import_unreal_usd():
-    factory = usd_factory()
-    task = unreal.AssetImportTask()
-    task.set_editor_property("filename", r"\\10.0.40.42\virtual\unreal_projects\Hero\Bridge\clarisse\USD_test\xhouse.usd")
-    task.set_editor_property("destination_path", "/Game/Content/xhouse")
-    factory.asset_import_task = task
-
-    unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
-
-import_unreal_usd()
-
-#import usd stage actor
-import unreal
-
-usd_class = unreal.UsdStageActor
-editor_actor_subsystem = unreal.EditorActorSubsystem()
-path = r"D:/test.usd"
-
-spawn_location = unreal.Vector(0.0, 0.0, 0.0)
-spawn_rotation = unreal.Rotator(0.0, 0.0, 0.0)
-
-spawned_actor = editor_actor_subsystem.spawn_actor_from_class(usd_class, spawn_location, spawn_rotation)
-spawned_actor.set_root_layer(path)
