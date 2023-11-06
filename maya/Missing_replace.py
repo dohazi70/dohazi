@@ -1,14 +1,13 @@
 import os
 import maya.cmds as cmds
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide2 import QtWidgets
 
 class MissingFilesWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(MissingFilesWindow, self).__init__(parent)
-        self.setWindowTitle("Missing Files")
+        self.setWindowTitle("File Status")
         self.setGeometry(200, 200, 600, 400)
         self.buildUI()
-        self.populate()
 
     def buildUI(self):
         layout = QtWidgets.QVBoxLayout(self)
@@ -26,14 +25,30 @@ class MissingFilesWindow(QtWidgets.QDialog):
         searchReplaceLayout.addWidget(self.replaceLineEdit)
 
         replaceButton = QtWidgets.QPushButton("Replace Paths")
-        replaceButton.clicked.connect(self.replacePaths)
         searchReplaceLayout.addWidget(replaceButton)
 
-        # Table Widget
-        self.tableWidget = QtWidgets.QTableWidget()
-        self.tableWidget.setColumnCount(2)
-        self.tableWidget.setHorizontalHeaderLabels(['File Path', 'Status'])
-        layout.addWidget(self.tableWidget)
+        # Tab Widget
+        self.tabWidget = QtWidgets.QTabWidget()
+        self.missingTab = QtWidgets.QWidget()
+        self.okTab = QtWidgets.QWidget()
+
+        self.tabWidget.addTab(self.missingTab, "Missing")
+        self.tabWidget.addTab(self.okTab, "OK")
+        layout.addWidget(self.tabWidget)
+
+        # Setup Missing Tab
+        self.missingLayout = QtWidgets.QVBoxLayout(self.missingTab)
+        self.missingTable = QtWidgets.QTableWidget()
+        self.missingTable.setColumnCount(2)
+        self.missingTable.setHorizontalHeaderLabels(['File Path', 'Status'])
+        self.missingLayout.addWidget(self.missingTable)
+
+        # Setup OK Tab
+        self.okLayout = QtWidgets.QVBoxLayout(self.okTab)
+        self.okTable = QtWidgets.QTableWidget()
+        self.okTable.setColumnCount(2)
+        self.okTable.setHorizontalHeaderLabels(['File Path', 'Status'])
+        self.okLayout.addWidget(self.okTable)
 
         # Close Button
         closeBtn = QtWidgets.QPushButton("Close")
@@ -41,7 +56,8 @@ class MissingFilesWindow(QtWidgets.QDialog):
         layout.addWidget(closeBtn)
 
     def populate(self):
-        self.tableWidget.setRowCount(0)
+        self.missingTable.setRowCount(0)
+        self.okTable.setRowCount(0)
 
         nodes_attrs = [
             ('file', 'fileTextureName'),
@@ -55,17 +71,25 @@ class MissingFilesWindow(QtWidgets.QDialog):
             for node in nodes:
                 if cmds.attributeQuery(attr_name, node=node, exists=True):
                     file_path = cmds.getAttr(f"{node}.{attr_name}")
+                    row_position = self.missingTable.rowCount() if not os.path.exists(file_path) else self.okTable.rowCount()
+                    table_to_use = self.missingTable if not os.path.exists(file_path) else self.okTable
 
-                    if file_path and not os.path.exists(file_path):
-                        row_position = self.tableWidget.rowCount()
-                        self.tableWidget.insertRow(row_position)
-                        self.tableWidget.setItem(row_position, 0, QtWidgets.QTableWidgetItem(file_path))
+                    table_to_use.insertRow(row_position)
+                    table_to_use.setItem(row_position, 0, QtWidgets.QTableWidgetItem(file_path))
+
+                    if not os.path.exists(file_path):
                         item = QtWidgets.QTableWidgetItem("Not Found")
                         icon = QtGui.QIcon(":status_error.png")
                         item.setIcon(icon)
-                        self.tableWidget.setItem(row_position, 1, item)
+                        table_to_use.setItem(row_position, 1, item)
+                    else:
+                        item = QtWidgets.QTableWidgetItem("Found")
+                        icon = QtGui.QIcon(":status_success.png")
+                        item.setIcon(icon)
+                        table_to_use.setItem(row_position, 1, item)
 
-        self.tableWidget.resizeColumnsToContents()
+        self.missingTable.resizeColumnsToContents()
+        self.okTable.resizeColumnsToContents()
 
     def replacePaths(self):
         search_str = self.searchLineEdit.text()
@@ -92,15 +116,7 @@ class MissingFilesWindow(QtWidgets.QDialog):
         self.populate()
 
 def showWindow():
-    try:
-        for widget in QtWidgets.QApplication.allWidgets():
-            if widget.objectName() == 'missingFilesWindow':
-                widget.close()
-    except:
-        pass
-
     win = MissingFilesWindow(parent=QtWidgets.QApplication.activeWindow())
-    win.setObjectName('missingFilesWindow')
     win.show()
 
 showWindow()
