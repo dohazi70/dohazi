@@ -79,11 +79,13 @@ class MissingFilesWindow(QtWidgets.QDialog):
 
                     if not os.path.exists(file_path):
                         item = QtWidgets.QTableWidgetItem("Not Found")
+                        item.setBackground(QtGui.QColor(255, 0, 0))
                         icon = QtGui.QIcon(":status_error.png")
                         item.setIcon(icon)
                         table_to_use.setItem(row_position, 1, item)
                     else:
                         item = QtWidgets.QTableWidgetItem("Found")
+                        item.setBackground(QtGui.QColor(0, 255, 0))
                         icon = QtGui.QIcon(":status_success.png")
                         item.setIcon(icon)
                         table_to_use.setItem(row_position, 1, item)
@@ -117,6 +119,8 @@ class MissingFilesWindow(QtWidgets.QDialog):
 
 def showWindow():
     win = MissingFilesWindow(parent=QtWidgets.QApplication.activeWindow())
+    win.populate
     win.show()
 
 showWindow()
+
