@@ -6,13 +6,12 @@ class MissingFilesWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(MissingFilesWindow, self).__init__(parent)
         self.setWindowTitle("File Status")
-        self.setGeometry(200, 200, 600, 400)
+        self.setGeometry(200, 200, 1200, 1200)
         self.buildUI()
 
     def buildUI(self):
         layout = QtWidgets.QVBoxLayout(self)
 
-        # Search and Replace layout
         searchReplaceLayout = QtWidgets.QHBoxLayout()
         layout.addLayout(searchReplaceLayout)
 
@@ -33,7 +32,7 @@ class MissingFilesWindow(QtWidgets.QDialog):
         self.okTab = QtWidgets.QWidget()
 
         self.tabWidget.addTab(self.missingTab, "Missing")
-        self.tabWidget.addTab(self.okTab, "OK")
+        self.tabWidget.addTab(self.okTab, "Found")
         layout.addWidget(self.tabWidget)
 
         # Setup Missing Tab
@@ -113,8 +112,7 @@ class MissingFilesWindow(QtWidgets.QDialog):
                     if file_path and search_str in file_path:
                         new_path = file_path.replace(search_str, replace_str)
                         cmds.setAttr(f"{node}.{attr_name}", new_path, type="string")
-
-        # Refresh the table
+                        
         self.populate()
 
 def showWindow():
