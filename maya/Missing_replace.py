@@ -1,6 +1,6 @@
 import os
 import maya.cmds as cmds
-from PySide2 import QtWidgets
+from PySide2 import QtGui, QtWidgets
 
 class MissingFilesWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):

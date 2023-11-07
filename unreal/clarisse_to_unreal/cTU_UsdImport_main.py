@@ -1,8 +1,9 @@
 import unreal
 import os
 from unreal import UsdStageImportFactory as usd_factory
-
+###
 folder_path = r'Z:\unreal_projects\Hero\Bridge\clarisse\USD_test'
+###
 file_list = [f for f in os.listdir(folder_path) if f.endswith('.usd')]
 
 

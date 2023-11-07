@@ -1,0 +1,44 @@
+[
+    {
+    "0": {
+        "mesh": "SM_WR1",
+        "mat": "SM_WR1_mtl",
+        "dif": "D:\\dev\\Code\\test\\ctu\\cTU_material\\tif\\storage_lunar_diffC.1001.tif"
+        }
+    },
+
+    {"1": {
+        "mesh": "SM_WR2",
+        "mat": "SM_WR2_mtl",
+        "dif": "D:\\dev\\Code\\test\\ctu\\cTU_material\\tif\\storage_lunar_diffC.1012.tif"
+        }
+    },
+        
+    {"2": {
+        "mesh": "SM_WR3",
+        "mat": "SM_WR3_mtl",
+        "dif": "D:\\dev\\Code\\test\\ctu\\cTU_material\\tif\\storage_lunar_diffC.1015.tif"
+        }
+    },
+
+    {"3": {
+        "mesh": "SM_WR5",
+        "mat": "SM_WR5_mtl",
+        "dif": "D:\\dev\\Code\\test\\ctu\\cTU_material\\tif\\storage_lunar_diffC.1018.tif"
+        }
+    },
+
+    {"4": {
+        "mesh": "SM_WR7",
+        "mat": "SM_WR7_mtl",
+        "dif": "D:\\dev\\Code\\test\\ctu\\cTU_material\\tif\\storage_lunar_diffC.1021.tif"
+        }
+    },
+
+    {"5": {
+        "mesh": "SM_WR9",
+        "mat": "SM_WR7_mtl",
+        "dif": "D:\\dev\\Code\\test\\ctu\\cTU_material\\tif\\storage_lunar_diffC.1021.tif"
+        }
+    }
+]

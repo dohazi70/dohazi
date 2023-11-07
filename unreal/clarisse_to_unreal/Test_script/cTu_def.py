@@ -77,12 +77,51 @@ def clarisse_TextureMapFile_data():
         positions = None
 
 # import texture
-def import_unreal_texture():
+def import_unreal_texture(file_path, destination_path, texture_name):
 
     import_task = unreal.AssetImportTask()
-    import_task.filename = r"D:\Data\snow_with_tall_grass_diffuse.jpg"
-    import_task.destination_path = "/Game/layout/a/snow_mountain/datail/dini_snow_mtl/snow_with_tall_grass_diffuse2"
-    import_task.destination_name = 'snow_with_tall_grass_diffuse'
+    import_task.filename = file_path
+    import_task.destination_path = destination_path
+    import_task.destination_name = texture_name
     import_task.options = None # https://docs.unrealengine.com/5.3/en-US/PythonAPI/class/AssetImportTask.html#unreal.AssetImportTask
 
     result = unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([import_task]) 
+
+# 머트리얼 및 텍스쳐 연동
+
+import unreal
+def material_instance():
+    material_instance_name = "NewMaterialInstance2"
+    material_instance_path = "/Game/Material/"
+    parent_material_path = "/Game/Material/ParentMaterial"
+
+    asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
+    parent_material = unreal.load_asset(parent_material_path)
+
+    material_instance = asset_tools.create_asset(material_instance_name, material_instance_path, unreal.MaterialInstanceConstant, None)
+
+    if material_instance:
+        material_instance.set_editor_property('Parent', parent_material)
+
+        texture_parameter_name = "BaseColor"
+        texture_asset_path = "/Game/Material/texture/storage_lunar_diffC"
+
+        texture_asset = unreal.load_asset(texture_asset_path)
+        if texture_asset and isinstance(texture_asset, unreal.Texture):
+            unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, unreal.Name(texture_parameter_name), texture_asset)
+
+        unreal.EditorAssetLibrary.save_loaded_asset(material_instance)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
