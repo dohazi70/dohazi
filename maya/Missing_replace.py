@@ -24,6 +24,7 @@ class MissingFilesWindow(QtWidgets.QDialog):
         searchReplaceLayout.addWidget(self.replaceLineEdit)
 
         replaceButton = QtWidgets.QPushButton("Replace Paths")
+        replaceButton.clicked.connect(self.replacePaths)
         searchReplaceLayout.addWidget(replaceButton)
 
         # Tab Widget

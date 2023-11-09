@@ -2,7 +2,8 @@ import unreal
 import os
 from unreal import UsdStageImportFactory as usd_factory
 ###
-folder_path = r'Z:\unreal_projects\Hero\Bridge\clarisse\USD_test'
+folder_path = r'\\10.0.40.42\show\tmp\recover\RND\20231026_assets\env_USD\goyobada\moongr_balhae'
+start_index = 1
 ###
 file_list = [f for f in os.listdir(folder_path) if f.endswith('.usd')]
 
@@ -40,7 +41,14 @@ def import_unreal_usd():
     unreal.EditorAssetLibrary.save_directory("/Game/layout", only_if_is_dirty=True, recursive=True)
     unreal.EditorLevelLibrary.save_current_level()
 
-for index, file_name in enumerate(file_list, start=1):
+
+for index, file_name in enumerate(file_list[start_index - 1:], start=start_index):
     file_path = os.path.join(folder_path, file_name)
     print(f"Processing file {index} of {len(file_list)} : {file_name}")
     import_unreal_usd()
+
+
+#for index, file_name in enumerate(file_list, start=1):
+#    file_path = os.path.join(folder_path, file_name)
+#    print(f"Processing file {index} of {len(file_list)} : {file_name}")
+#    import_unreal_usd()
