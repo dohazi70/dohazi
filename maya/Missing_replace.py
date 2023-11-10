@@ -27,6 +27,10 @@ class MissingFilesWindow(QtWidgets.QDialog):
         replaceButton.clicked.connect(self.replacePaths)
         searchReplaceLayout.addWidget(replaceButton)
 
+        udimset = QtWidgets.QPushButton("UDIM_1K")
+        udimset.clicked.connect(self.udimset)
+        searchReplaceLayout.addWidget(udimset)
+
         # Tab Widget
         self.tabWidget = QtWidgets.QTabWidget()
         self.missingTab = QtWidgets.QWidget()
@@ -117,6 +121,14 @@ class MissingFilesWindow(QtWidgets.QDialog):
                         cmds.setAttr(f"{node}.{attr_name}", new_path, type="string")
                         
         self.populate()
+
+    def udimset():
+        texture_nodes = cmds.ls(type='file')
+        for texture_node in texture_nodes:
+            try:
+                cmds.setAttr(f"{texture_node}.uvTilingMode", 3)
+                cmds.setAttr(f"{texture_node}.uvTileProxyQuality", 1)
+            except: print(f"Error setting resolution for")
 
 def showWindow():
     win = MissingFilesWindow(parent=QtWidgets.QApplication.activeWindow())
