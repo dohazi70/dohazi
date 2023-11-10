@@ -1,5 +1,6 @@
 import os
 import maya.cmds as cmds
+import shutil
 from PySide2 import QtGui, QtWidgets
 
 class MissingFilesWindow(QtWidgets.QDialog):
@@ -14,6 +15,8 @@ class MissingFilesWindow(QtWidgets.QDialog):
 
         searchReplaceLayout = QtWidgets.QHBoxLayout()
         layout.addLayout(searchReplaceLayout)
+        copyLayout = QtWidgets.QHBoxLayout()
+        layout.addLayout(copyLayout)
 
         searchReplaceLayout.addWidget(QtWidgets.QLabel("Search:"))
         self.searchLineEdit = QtWidgets.QLineEdit()
@@ -23,9 +26,17 @@ class MissingFilesWindow(QtWidgets.QDialog):
         self.replaceLineEdit = QtWidgets.QLineEdit()
         searchReplaceLayout.addWidget(self.replaceLineEdit)
 
-        replaceButton = QtWidgets.QPushButton("Replace Paths")
+        copyLayout.addWidget(QtWidgets.QLabel("Copy Path:"))
+        self.copyLineEdit = QtWidgets.QLineEdit()
+        copyLayout.addWidget(self.copyLineEdit)
+
+        replaceButton = QtWidgets.QPushButton("Replace")
         replaceButton.clicked.connect(self.replacePaths)
         searchReplaceLayout.addWidget(replaceButton)
+
+        CopyButton = QtWidgets.QPushButton("Copy")
+        CopyButton.clicked.connect(self.copy_files)
+        copyLayout.addWidget(CopyButton)
 
         udimset = QtWidgets.QPushButton("UDIM_1K")
         udimset.clicked.connect(self.udimset)
@@ -122,13 +133,33 @@ class MissingFilesWindow(QtWidgets.QDialog):
                         
         self.populate()
 
-    def udimset():
+    def udimset(self):
         texture_nodes = cmds.ls(type='file')
         for texture_node in texture_nodes:
             try:
                 cmds.setAttr(f"{texture_node}.uvTilingMode", 3)
                 cmds.setAttr(f"{texture_node}.uvTileProxyQuality", 1)
             except: print(f"Error setting resolution for")
+
+    def copy_files(self):
+        destination_directory = self.copyLineEdit.text()
+        valid_paths = []
+        file_nodes = cmds.ls(type="file")
+
+        for node in file_nodes:
+            path = cmds.getAttr(f"{node}.fileTextureName")
+            if os.path.exists(path):
+                valid_paths.append(path)
+
+        for path in valid_paths:
+            file_name = os.path.basename(path)
+            destination = os.path.join(destination_directory, file_name)
+            shutil.copy2(path, destination)
+
+            print(f"Copied {path} to {destination}")
+
+        print("successfully.")
+
 
 def showWindow():
     win = MissingFilesWindow(parent=QtWidgets.QApplication.activeWindow())
