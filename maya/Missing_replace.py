@@ -143,22 +143,42 @@ class MissingFilesWindow(QtWidgets.QDialog):
 
     def copy_files(self):
         destination_directory = self.copyLineEdit.text()
-        valid_paths = []
-        file_nodes = cmds.ls(type="file")
+        texture_nodes = cmds.ls(type='file')
+        valid_file_names = set()
+        unique_paths = set()
 
-        for node in file_nodes:
+        for node in texture_nodes:
             path = cmds.getAttr(f"{node}.fileTextureName")
-            if os.path.exists(path):
-                valid_paths.append(path)
+            parts = path.split("/")
+            if len(parts) > 1:
+                unique_paths.add("/".join(parts[:-1]))
 
-        for path in valid_paths:
             file_name = os.path.basename(path)
-            destination = os.path.join(destination_directory, file_name)
-            shutil.copy2(path, destination)
+            file_name_without_extension, extension = os.path.splitext(file_name)
 
-            print(f"Copied {path} to {destination}")
+            if file_name_without_extension[-4:].isdigit():
+                file_name_without_numbers = file_name_without_extension[:-5]
+            else:
+                file_name_without_numbers = file_name_without_extension
 
-        print("successfully.")
+            valid_file_names.add(file_name_without_numbers)
+
+        total_files = len(unique_paths) * len(valid_file_names)
+        current_file_index = 0
+
+        for unique_path in unique_paths:
+            for valid_file_name in valid_file_names:
+                try:
+                    for node in texture_nodes:
+                        path = cmds.getAttr(f"{node}.fileTextureName")
+                        if valid_file_name in path:
+                            destination = os.path.join(destination_directory, os.path.basename(path))
+                            shutil.copy2(path, destination)
+                            
+                            current_file_index += 1
+                            print(f"{current_file_index}/{total_files}")
+                except FileNotFoundError:
+                    pass
 
 
 def showWindow():
