@@ -152,33 +152,28 @@ class MissingFilesWindow(QtWidgets.QDialog):
             parts = path.split("/")
             if len(parts) > 1:
                 unique_paths.add("/".join(parts[:-1]))
-
+                
             file_name = os.path.basename(path)
             file_name_without_extension, extension = os.path.splitext(file_name)
-
-            if file_name_without_extension[-4:].isdigit():
-                file_name_without_numbers = file_name_without_extension[:-5]
-            else:
-                file_name_without_numbers = file_name_without_extension
-
-            valid_file_names.add(file_name_without_numbers)
-
-        total_files = len(unique_paths) * len(valid_file_names)
-        current_file_index = 0
+            
+            extracted_name = file_name_without_extension[:7]
+            valid_file_names.add(extracted_name)
 
         for unique_path in unique_paths:
-            for valid_file_name in valid_file_names:
-                try:
-                    for node in texture_nodes:
-                        path = cmds.getAttr(f"{node}.fileTextureName")
-                        if valid_file_name in path:
-                            destination = os.path.join(destination_directory, os.path.basename(path))
-                            shutil.copy2(path, destination)
-                            
-                            current_file_index += 1
-                            print(f"{current_file_index}/{total_files}")
-                except FileNotFoundError:
-                    pass
+            files_in_path = os.listdir(unique_path)
+            total_files = len(files_in_path)
+            for index, extracted_name in enumerate(valid_file_names, start=1):
+                for file_name in files_in_path:
+                    if extracted_name in file_name:
+                        source_path = os.path.join(unique_path, file_name)
+                        destination = os.path.join(destination_directory, file_name)
+                        if not os.path.isdir(source_path):
+                            try:
+                                shutil.copy2(source_path, destination)
+                                print(f"[{index}/{total_files}] Copied {source_path} to {destination}")
+                            except Exception as e:
+                                print(f"[{index}/{total_files}] Error copying {source_path}: {e}")
+
 
 
 def showWindow():
@@ -187,4 +182,3 @@ def showWindow():
     win.show()
 
 showWindow()
-
