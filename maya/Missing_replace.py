@@ -38,6 +38,10 @@ class MissingFilesWindow(QtWidgets.QDialog):
         CopyButton.clicked.connect(self.copy_files)
         copyLayout.addWidget(CopyButton)
 
+        tifButton = QtWidgets.QPushButton("tif")
+        tifButton.clicked.connect(self.tifs)
+        copyLayout.addWidget(tifButton)
+
         udimset = QtWidgets.QPushButton("UDIM")
         udimset.clicked.connect(self.udimset)
         searchReplaceLayout.addWidget(udimset)
@@ -172,6 +176,15 @@ class MissingFilesWindow(QtWidgets.QDialog):
             else:
                 print(f"none: {node}")
                 cmds.setAttr(f"{node}.uvTilingMode", 0)
+    
+    def tifs(self):
+        file_nodes = cmds.ls(type='file')
+        for f in file_nodes:
+            current_path = cmds.getAttr(f + '.fileTextureName')
+            file_name = os.path.basename(current_path)
+            new_path = './tif/' + file_name
+            cmds.setAttr(f + '.fileTextureName', new_path, type='string')
+        self.populate()
 
     def copy_files(self):
         destination_directory = self.copyLineEdit.text()
@@ -191,20 +204,42 @@ class MissingFilesWindow(QtWidgets.QDialog):
             extracted_name = file_name_without_extension[:7]
             valid_file_names.add(extracted_name)
 
+        # for unique_path in unique_paths:
+        #     files_in_path = os.listdir(unique_path)
+        #     total_files = len(file_name)
+        #     for index, extracted_name in enumerate(valid_file_names, start=1):
+        #         for file_name in files_in_path:
+        #             if extracted_name in file_name:
+        #                 source_path = os.path.join(unique_path, file_name)
+        #                 destination = os.path.join(destination_directory, file_name)
+        #                 if not os.path.isdir(source_path):
+        #                     try:
+        #                         shutil.copy2(source_path, destination)
+        #                         print(f'{index} / {total_files}')
+        #                     except Exception as e:
+        #                         print(f"[{index}/{total_files}] Error copying {source_path}: {e}")
+        # print('done')
+
+        index = 1  # 인덱스 초기화
+        total_files = len(valid_file_names)  # 전체 파일 수
+
         for unique_path in unique_paths:
             files_in_path = os.listdir(unique_path)
-            total_files = len(files_in_path)
-            for index, extracted_name in enumerate(valid_file_names, start=1):
-                for file_name in files_in_path:
+            for file_name in files_in_path:
+                for extracted_name in valid_file_names:
                     if extracted_name in file_name:
                         source_path = os.path.join(unique_path, file_name)
                         destination = os.path.join(destination_directory, file_name)
                         if not os.path.isdir(source_path):
                             try:
                                 shutil.copy2(source_path, destination)
-                                print(f"[{index}/{total_files}]")
+                                print(f'{index} / {total_files}')
+                                index += 1  # 인덱스 증가
                             except Exception as e:
                                 print(f"[{index}/{total_files}] Error copying {source_path}: {e}")
+
+        print('done')
+
 
 
 
