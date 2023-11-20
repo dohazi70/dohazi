@@ -38,6 +38,10 @@ class MissingFilesWindow(QtWidgets.QDialog):
         CopyButton.clicked.connect(self.copy_files)
         copyLayout.addWidget(CopyButton)
 
+        assButton = QtWidgets.QPushButton("ass")
+        assButton.clicked.connect(self.ass_copy)
+        copyLayout.addWidget(assButton)
+
         tifButton = QtWidgets.QPushButton("tif")
         tifButton.clicked.connect(self.tifs)
         copyLayout.addWidget(tifButton)
@@ -187,14 +191,12 @@ class MissingFilesWindow(QtWidgets.QDialog):
             cmds.setAttr(f + '.fileTextureName', new_path, type='string')
         self.populate()
 
-    def copy_files(self):
+
+    def ass_copy(self):
         destination_directory = self.copyLineEdit.text()
         ass_nodes = cmds.ls(type='aiStandIn')
-        texture_nodes = cmds.ls(type='file')
         ass_file_paths = []
-        valid_file_names = set()
-        unique_paths = set()
-##ass
+
         for ass_node in ass_nodes:
             ass_path = cmds.getAttr(f"{ass_node}.dso")
             if ass_path.lower().endswith(".ass"):
@@ -210,7 +212,13 @@ class MissingFilesWindow(QtWidgets.QDialog):
             except Exception as e:
                 print(f"Error copying {ass_file_paths}: {e}")
 
-##files
+    def copy_files(self):
+        destination_directory = self.copyLineEdit.text()
+        texture_nodes = cmds.ls(type='file')
+        valid_file_names = set()
+        unique_paths = set()
+
+
         for node in texture_nodes:
             path = cmds.getAttr(f"{node}.fileTextureName")
             parts = path.split("/")
