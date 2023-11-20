@@ -194,27 +194,23 @@ class MissingFilesWindow(QtWidgets.QDialog):
         ass_file_paths = []
         valid_file_names = set()
         unique_paths = set()
-
-        ## ass
-        for node in ass_nodes:
-            ass_path = cmds.getAttr(f"{node}.dso")
-            if ass_path.lower().endsswith(".ass"):
+##ass
+        for ass_node in ass_nodes:
+            ass_path = cmds.getAttr(f"{ass_node}.dso")
+            if ass_path.lower().endswith(".ass"):
                 ass_file_paths.append(ass_path)
-        
         ass_index = 1
-        
         for ass_path in ass_file_paths:
-            ass_file_name = os.path.basename(ass_path)
-            destination = os.path.join(destination_directory, ass_file_name)
+            ass_file_paths = os.path.basename(ass_path)
+            ass_destination = os.path.join(destination_directory, ass_file_paths)
             try:
-                shutil.copy2(ass_path, destination)
+                shutil.copy2(ass_path, ass_destination)
                 print(f"{ass_index}")
                 ass_index += 1
             except Exception as e:
-                print(f"Error copying {file_name}: {e}")
+                print(f"Error copying {ass_file_paths}: {e}")
 
-            
-        ## file
+##files
         for node in texture_nodes:
             path = cmds.getAttr(f"{node}.fileTextureName")
             parts = path.split("/")
@@ -222,7 +218,7 @@ class MissingFilesWindow(QtWidgets.QDialog):
                 unique_paths.add("/".join(parts[:-1]))
                 
             file_name = os.path.basename(path)
-            file_name_without_extension = os.path.splitext(file_name)
+            file_name_without_extension, extension = os.path.splitext(file_name)
             
             extracted_name = file_name_without_extension[:7]
             valid_file_names.add(extracted_name)
