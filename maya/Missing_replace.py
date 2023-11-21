@@ -51,6 +51,10 @@ class MissingFilesWindow(QtWidgets.QDialog):
         udimset = QtWidgets.QPushButton("Set Udim")
         udimset.clicked.connect(self.udimset)
         buttonLayout.addWidget(udimset)
+        
+        refresh = QtWidgets.QPushButton("Refresh")
+        refresh.clicked.connect(self.populate)
+        buttonLayout.addWidget(refresh)
 
         # Tab Widget
         self.tabWidget = QtWidgets.QTabWidget()
@@ -79,6 +83,8 @@ class MissingFilesWindow(QtWidgets.QDialog):
         closeBtn = QtWidgets.QPushButton("Close")
         closeBtn.clicked.connect(self.close)
         layout.addWidget(closeBtn)
+
+
 
     def populate(self):
         self.missingTable.setRowCount(0)
@@ -145,42 +151,12 @@ class MissingFilesWindow(QtWidgets.QDialog):
 
     def udimset(self):
         texture_nodes = cmds.ls(type='file')
-        unique_paths = set()
-        file_name_last = []
-        duplicate_names = []
-        unique_names = []
-
         for node in texture_nodes:
-            path = cmds.getAttr(f"{node}.fileTextureName")
-            parts = path.split("/")
-            if len(parts) > 1:
-                unique_paths.add("/".join(parts[:-1]))
-                
-            file_name = os.path.basename(path)
-            file_name_without_extension, extension = os.path.splitext(file_name)
-            
-            if file_name_without_extension and file_name_without_extension[-1].isdigit():
-                processed_name = file_name_without_extension[:-4]
-                file_name_last.append(processed_name)
-            else:
-                file_name_last.append(file_name_without_extension)
-
-        for name in file_name_last:
-            if file_name_last.count(name) > 1:
-                duplicate_names.append(name)
-            else:
-                unique_names.append(name)
-
-        texture_nodes = cmds.ls(type='file')
-
-        for node in texture_nodes:
-            path = cmds.getAttr(f"{node}.fileTextureName")
-            if any(name in path for name in duplicate_names):
-                print(f"uv: {node}")
+            file_path = cmds.getAttr(f"{node}.fileTextureName")
+            if '<udim>' in file_path.lower():
                 cmds.setAttr(f"{node}.uvTilingMode", 3)
                 cmds.setAttr(f"{node}.uvTileProxyQuality", 1)
             else:
-                print(f"none: {node}")
                 cmds.setAttr(f"{node}.uvTilingMode", 0)
         self.populate()
     
