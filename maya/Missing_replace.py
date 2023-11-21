@@ -47,10 +47,6 @@ class MissingFilesWindow(QtWidgets.QDialog):
         tifButton = QtWidgets.QPushButton("Set tif")
         tifButton.clicked.connect(self.tifs)
         buttonLayout.addWidget(tifButton)
-
-        udimset = QtWidgets.QPushButton("Set Udim")
-        udimset.clicked.connect(self.udimset)
-        buttonLayout.addWidget(udimset)
         
         refresh = QtWidgets.QPushButton("Refresh")
         refresh.clicked.connect(self.populate)
@@ -149,25 +145,52 @@ class MissingFilesWindow(QtWidgets.QDialog):
                         
         self.populate()
 
-    def udimset(self):
-        texture_nodes = cmds.ls(type='file')
-        for node in texture_nodes:
-            file_path = cmds.getAttr(f"{node}.fileTextureName")
-            if '<udim>' in file_path.lower():
+    def tifs(self):
+        def find_first_numeric_file(folder_path, base_name):
+            numeric_files = []
+
+            for file in os.listdir(folder_path):
+                if base_name in file:
+                    numbers = re.findall(r'\d+', file)
+                    if numbers:
+                        numeric_files.append((int(numbers[0]), file))
+
+            numeric_files.sort()
+            return numeric_files[0][1] if numeric_files else None
+        def find_numeric_file(folder_path, base_name):
+            numeric_files2 = []
+
+            for file in os.listdir(folder_path):
+                if base_name in file:
+                    numbers = re.findall(r'\d+', file)
+                    if numbers:
+                        numeric_files2.append((int(numbers[0]), file))
+            return numeric_files2
+        file_path = r"./tif"
+        file_nodes = cmds.ls(type = 'file')
+        for node in file_nodes:
+            file_full_name = cmds.getAttr(f"{node}.fileTextureName")
+            file_1base_name = os.path.basename(file_full_name)
+            file_base_name = os.path.splitext(file_1base_name)[0]
+            file_base_name_cleaned = re.sub(r'\d{4}$', '', file_base_name)
+            file_base_name_cleaned_udim = file_base_name_cleaned.replace("<UDIM>", "").replace("<udim>", "")
+            find_file = find_first_numeric_file(file_path, file_base_name_cleaned_udim)
+            find_file_index = find_numeric_file(file_path, file_base_name_cleaned_udim)
+            
+            if find_file is not None:
+                new_path = './tif/' + find_file
+                cmds.setAttr(node + '.fileTextureName', new_path, type='string')
+            else:
+                notnew_path = './tif/' + file_1base_name
+                cmds.setAttr(node + '.fileTextureName', notnew_path, type='string')
+            
+            if len(find_file_index) == 2:
+                cmds.setAttr(f"{node}.uvTilingMode", 0)
+            elif len(find_file_index) > 2:
                 cmds.setAttr(f"{node}.uvTilingMode", 3)
                 cmds.setAttr(f"{node}.uvTileProxyQuality", 1)
-            else:
-                cmds.setAttr(f"{node}.uvTilingMode", 0)
-        self.populate()
-    
-    def tifs(self):
-        file_nodes = cmds.ls(type='file')
+        
         ass_nodes = cmds.ls(type='aiStandIn')
-        for f in file_nodes:
-            current_path = cmds.getAttr(f + '.fileTextureName')
-            file_name = os.path.basename(current_path)
-            new_path = './tif/' + file_name
-            cmds.setAttr(f + '.fileTextureName', new_path, type='string')
         for a in ass_nodes:
             a_current_path = cmds.getAttr(a + '.dso')
             a_file_name = os.path.basename(a_current_path)
