@@ -7,7 +7,7 @@ class MissingFilesWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(MissingFilesWindow, self).__init__(parent)
         self.setWindowTitle("File Status")
-        self.setGeometry(200, 200, 1200, 1200)
+        self.setGeometry(200, 200, 1000, 1200)
         self.buildUI()
 
     def buildUI(self):
@@ -17,6 +17,8 @@ class MissingFilesWindow(QtWidgets.QDialog):
         layout.addLayout(searchReplaceLayout)
         copyLayout = QtWidgets.QHBoxLayout()
         layout.addLayout(copyLayout)
+        buttonLayout = QtWidgets.QHBoxLayout()
+        layout.addLayout(buttonLayout)
 
         searchReplaceLayout.addWidget(QtWidgets.QLabel("Search:"))
         self.searchLineEdit = QtWidgets.QLineEdit()
@@ -42,13 +44,13 @@ class MissingFilesWindow(QtWidgets.QDialog):
         assButton.clicked.connect(self.ass_copy)
         copyLayout.addWidget(assButton)
 
-        tifButton = QtWidgets.QPushButton("tif")
+        tifButton = QtWidgets.QPushButton("Set tif")
         tifButton.clicked.connect(self.tifs)
-        copyLayout.addWidget(tifButton)
+        buttonLayout.addWidget(tifButton)
 
-        udimset = QtWidgets.QPushButton("UDIM")
+        udimset = QtWidgets.QPushButton("Set Udim")
         udimset.clicked.connect(self.udimset)
-        searchReplaceLayout.addWidget(udimset)
+        buttonLayout.addWidget(udimset)
 
         # Tab Widget
         self.tabWidget = QtWidgets.QTabWidget()
@@ -184,11 +186,17 @@ class MissingFilesWindow(QtWidgets.QDialog):
     
     def tifs(self):
         file_nodes = cmds.ls(type='file')
+        ass_nodes = cmds.ls(type='aiStandIn')
         for f in file_nodes:
             current_path = cmds.getAttr(f + '.fileTextureName')
             file_name = os.path.basename(current_path)
             new_path = './tif/' + file_name
             cmds.setAttr(f + '.fileTextureName', new_path, type='string')
+        for a in ass_nodes:
+            a_current_path = cmds.getAttr(a + '.dso')
+            a_file_name = os.path.basename(a_current_path)
+            a_new_path = './tif/' + a_file_name
+            cmds.setAttr(a + '.dso', a_new_path, type='string')
         self.populate()
 
 
@@ -211,45 +219,48 @@ class MissingFilesWindow(QtWidgets.QDialog):
                 ass_index += 1
             except Exception as e:
                 print(f"Error copying {ass_file_paths}: {e}")
+    print("ass copy done")
+
 
     def copy_files(self):
         destination_directory = self.copyLineEdit.text()
         texture_nodes = cmds.ls(type='file')
         valid_file_names = set()
         unique_paths = set()
-
-
-        for node in texture_nodes:
-            path = cmds.getAttr(f"{node}.fileTextureName")
-            parts = path.split("/")
-            if len(parts) > 1:
-                unique_paths.add("/".join(parts[:-1]))
+        try:
+            for node in texture_nodes:
+                path = cmds.getAttr(f"{node}.fileTextureName")
+                parts = path.split("/")
+                if len(parts) > 1:
+                    unique_paths.add("/".join(parts[:-1]))
+                    
+                file_name = os.path.basename(path)
+                file_name_without_extension, extension = os.path.splitext(file_name)
                 
-            file_name = os.path.basename(path)
-            file_name_without_extension, extension = os.path.splitext(file_name)
-            
-            extracted_name = file_name_without_extension[:7]
-            valid_file_names.add(extracted_name)
+                extracted_name = file_name_without_extension[:7]
+                valid_file_names.add(extracted_name)
 
-        index = 1
-        total_files = len(valid_file_names)
+            index = 1
+            total_files = len(valid_file_names)
 
-        for unique_path in unique_paths:
-            files_in_path = os.listdir(unique_path)
-            for file_name in files_in_path:
-                for extracted_name in valid_file_names:
-                    if extracted_name in file_name:
-                        source_path = os.path.join(unique_path, file_name)
-                        destination = os.path.join(destination_directory, file_name)
-                        if not os.path.isdir(source_path):
-                            try:
-                                shutil.copy2(source_path, destination)
-                                print(f'{index}')
-                                index += 1  # 인덱스 증가
-                            except Exception as e:
-                                print(f"[{index}/{total_files}] Error copying {source_path}: {e}")
+            for unique_path in unique_paths:
+                files_in_path = os.listdir(unique_path)
+                for file_name in files_in_path:
+                    for extracted_name in valid_file_names:
+                        if extracted_name in file_name:
+                            source_path = os.path.join(unique_path, file_name)
+                            destination = os.path.join(destination_directory, file_name)
+                            if not os.path.isdir(source_path):
+                                try:
+                                    shutil.copy2(source_path, destination)
+                                    print(f'{index}')
+                                    index += 1  # 인덱스 증가
+                                except Exception as e:
+                                    print(f"[{index}/{total_files}] Error copying {source_path}: {e}")
+        except:
+            print("none")
 
-        print('done')
+        print('texture copy done')
 
 
 
