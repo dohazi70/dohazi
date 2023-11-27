@@ -1,7 +1,29 @@
 import os
 import maya.cmds as cmds
 import shutil
+import re
 from PySide2 import QtGui, QtWidgets
+
+def find_first_numeric_file(folder_path, base_name):
+    numeric_files = []
+
+    for file in os.listdir(folder_path):
+        if base_name in file:
+            numbers = re.findall(r'\d+', file)
+            if numbers:
+                numeric_files.append((int(numbers[0]), file))
+
+    numeric_files.sort()
+    return numeric_files[0][1] if numeric_files else None
+def find_numeric_file(folder_path, base_name):
+    numeric_files2 = []
+
+    for file in os.listdir(folder_path):
+        if base_name in file:
+            numbers = re.findall(r'\d+', file)
+            if numbers:
+                numeric_files2.append((int(numbers[0]), file))
+    return numeric_files2
 
 class MissingFilesWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -146,26 +168,6 @@ class MissingFilesWindow(QtWidgets.QDialog):
         self.populate()
 
     def tifs(self):
-        def find_first_numeric_file(folder_path, base_name):
-            numeric_files = []
-
-            for file in os.listdir(folder_path):
-                if base_name in file:
-                    numbers = re.findall(r'\d+', file)
-                    if numbers:
-                        numeric_files.append((int(numbers[0]), file))
-
-            numeric_files.sort()
-            return numeric_files[0][1] if numeric_files else None
-        def find_numeric_file(folder_path, base_name):
-            numeric_files2 = []
-
-            for file in os.listdir(folder_path):
-                if base_name in file:
-                    numbers = re.findall(r'\d+', file)
-                    if numbers:
-                        numeric_files2.append((int(numbers[0]), file))
-            return numeric_files2
         file_path = r"./tif"
         file_nodes = cmds.ls(type = 'file')
         for node in file_nodes:
@@ -253,7 +255,7 @@ class MissingFilesWindow(QtWidgets.QDialog):
                                 try:
                                     shutil.copy2(source_path, destination)
                                     print(f'{index}')
-                                    index += 1  # 인덱스 증가
+                                    index += 1
                                 except Exception as e:
                                     print(f"[{index}/{total_files}] Error copying {source_path}: {e}")
         except:

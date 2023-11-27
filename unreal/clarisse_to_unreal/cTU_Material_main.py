@@ -10,8 +10,8 @@ def import_unreal_texture(texture_file_path, destination_path, texture_name):
     import_task.destination_path = destination_path
     import_task.destination_name = texture_name
     import_task.options = None
-    result = unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([import_task]) 
-def material_instance(mtl_instance_name, texture_path):
+    unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([import_task]) 
+def material_instance(mtl_instance_name, texture_path, uv_x, uv_y):
     material_instance_name = mtl_instance_name
     material_instance_path = "/Game/Material/"
     parent_material_path = "/Game/Material/ParentMaterial"
@@ -25,15 +25,21 @@ def material_instance(mtl_instance_name, texture_path):
         material_instance.set_editor_property('Parent', parent_material)
 
         texture_parameter_name = "BaseColor"
+        texture_uv_x = "X"
+        texture_uv_y = "Y"
         texture_asset_path = texture_path
 
-        texture_asset = unreal.load_asset(texture_asset_path)
-        if texture_asset and isinstance(texture_asset, unreal.Texture):
-            unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, unreal.Name(texture_parameter_name), texture_asset)
+        texture_asset = unreal.load_asset(texture_asset_path)    
+        unreal.MaterialEditingLibrary.set_material_instance_scalar_parameter_value(material_instance, unreal.Name(texture_uv_x), uv_x)
+        unreal.MaterialEditingLibrary.set_material_instance_scalar_parameter_value(material_instance, unreal.Name(texture_uv_y), uv_y)
+        unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, unreal.Name(texture_parameter_name), texture_asset)
+        #if texture_asset and isinstance(texture_asset, unreal.Texture):
+            #unreal.MaterialEditingLibrary.set_material_instance_texture_parameter_value(material_instance, unreal.Name(texture_parameter_name), texture_asset)
+
 
         unreal.EditorAssetLibrary.save_loaded_asset(material_instance)
 def find_static_meshes(search_string):
-    all_static_meshes = unreal.EditorAssetLibrary.list_assets('/Game/layout', recursive=True, include_folder=True)
+    all_static_meshes = unreal.EditorAssetLibrary.list_assets('/Game/layout/han_river', recursive=True, include_folder=True)
     
     matching_meshes = []
     for mesh in all_static_meshes:
@@ -55,6 +61,7 @@ def find_material(search_string):
 def process_json_data(Json_data):
     all_matching_meshes = []
     all_matching_materials = []
+    #unmatched_materials = []
 
     for item_dict in Json_data:
         for key in item_dict:
@@ -70,7 +77,7 @@ def process_json_data(Json_data):
     # 모든 처리가 끝난 후, 메시 리스트와 재질 리스트를 반환합니다.
     return all_matching_meshes, all_matching_materials
 
-Json_file_path = r'D:\dev\Code\dohazi\unreal\clarisse_to_unreal\Test_script\test.json'
+Json_file_path = r'Z:\unreal_projects\Jaruwon\json\EP10_S075_9000_gen_dev_v003_w013_backup_edit_mesh_info.json'
 
 ue_material_path = '/Game/Material'
 ue_texture_path = '/Game/Material/Texture'
@@ -80,24 +87,40 @@ with open(Json_file_path, 'r') as file:
 
 unique_difs = []
 unique_mats = []
+unique_x = []
+unique_y = []
+dif_texture = []
 
 for item_dict in Json_data:
     for key in item_dict:
         dif_value = item_dict[key]['dif']
         mat_value = item_dict[key]['mat']
+        x_value = item_dict[key]['x']
+        y_value = item_dict[key]['y']
+        unique_x.append(x_value)
+        unique_y.append(y_value)
         if dif_value not in unique_difs:
             unique_difs.append(dif_value)
         if mat_value not in unique_mats:
             unique_mats.append(mat_value)
 
+
 for dif in unique_difs:
     dif_extension = os.path.splitext(os.path.basename(dif))[0]
     dif_base_name = re.sub(r'\.\d+$', '', dif_extension)
-    import_unreal_texture(dif, ue_texture_path, dif_base_name)
+    dif_texture.append(dif_base_name)
+    #import_unreal_texture(dif, ue_texture_path, dif_base_name)
 
-for mat in unique_mats:
-    dif_local_path = ue_texture_path + "/" + dif_base_name
-    material_instance(mat, dif_local_path)
+for mat, x, y, dif in zip(unique_mats, unique_x, unique_y, unique_difs):
+    dif_texture = os.path.basename(dif)
+    dif_texture = os.path.splitext(dif_texture)[0]
+    dif_texture = re.sub(r'\d{4}$', '', dif_texture)
+    dif_ortexture = dif_texture.replace(".", "")
+    dif_local_path = ue_texture_path + "/" + dif_ortexture
+    x_value = float(x)
+    y_value = float(y)
+    #material_instance(mat, dif_local_path, x_value, y_value)
+
 
 matching_meshes, matching_materials = process_json_data(Json_data)
 

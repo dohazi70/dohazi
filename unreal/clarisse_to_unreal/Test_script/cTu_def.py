@@ -183,3 +183,11 @@ material = unreal.EditorAssetLibrary.load_asset(material_path)
 unreal.StaticMesh.set_material(static_mesh, 0, material)
 
 
+import maya.cmds as cmds
+
+valid_paths
+texture_nodes = cmds.ls(type='file')
+
+for node in texture_nodes:
+    path = cmds.getAttr(f"{node}.fileTextureName")
+    print(path)
