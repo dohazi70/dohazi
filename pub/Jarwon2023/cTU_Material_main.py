@@ -91,6 +91,34 @@ unique_x = []
 unique_y = []
 dif_texture = []
 
+asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
+mtl = unreal.MaterialEditingLibrary()
+
+material = asset_tools.create_asset('ParentMaterial', '/Game/Material', unreal.Material, unreal.MaterialFactoryNew())
+
+texture_sample = mtl.create_material_expression(material, unreal.MaterialExpressionTextureSampleParameter2D, -400, 0)
+texture_sample.set_editor_property("parameter_name", "BaseColor")
+
+Mulitply = mtl.create_material_expression(material, unreal.MaterialExpressionMultiply, -200, 0)
+tex_coord = unreal.MaterialEditingLibrary.create_material_expression(material, unreal.MaterialExpressionTextureCoordinate, -600, -100)
+append_vector = unreal.MaterialEditingLibrary.create_material_expression(material, unreal.MaterialExpressionAppendVector, -600, 100)
+
+scalar_x = unreal.MaterialEditingLibrary.create_material_expression(material, unreal.MaterialExpressionScalarParameter, -800, 50)
+scalar_x.set_editor_property("parameter_name", 'X')
+scalar_x.set_editor_property("default_value", 1.0)
+
+scalar_y = unreal.MaterialEditingLibrary.create_material_expression(material, unreal.MaterialExpressionScalarParameter, -800, 150)
+scalar_y.set_editor_property("parameter_name", 'Y')
+scalar_y.set_editor_property("default_value", 1.0)
+
+unreal.MaterialEditingLibrary.connect_material_expressions(scalar_x, '', append_vector, 'A')
+unreal.MaterialEditingLibrary.connect_material_expressions(scalar_y, '', append_vector, 'B')
+unreal.MaterialEditingLibrary.connect_material_expressions(append_vector, '', Mulitply, 'B')
+unreal.MaterialEditingLibrary.connect_material_expressions(tex_coord, '', Mulitply, 'A')
+unreal.MaterialEditingLibrary.connect_material_expressions(Mulitply, '', texture_sample, 'UVs')
+
+unreal.MaterialEditingLibrary.connect_material_property(texture_sample, '', unreal.MaterialProperty.MP_BASE_COLOR)
+
 for item_dict in Json_data:
     for key in item_dict:
         dif_value = item_dict[key]['dif']

@@ -29,29 +29,31 @@ class EventReWire(ix.api.EventObject):
 
     def ExportUSD(self, sender, evtid):
         root_dir = rootPathLineEdit.get_text()
-
-        export_ui = ix.item_exists("default://usd_export_ui")
-        if export_ui == None:
-            export_ui = ix.create_object("usd_export_ui", "UsdExportUI", ix.get_item("default:/"))
-            export_ui.set_private(True)
-            export_ui.set_static(True)
-        
-        for i in range(len(selection_list)):
-            ix.selection.deselect_all()
+        if root_dir:
+            export_ui = ix.item_exists("default://usd_export_ui")
+            if export_ui == None:
+                export_ui = ix.create_object("usd_export_ui", "UsdExportUI", ix.get_item("default:/"))
+                export_ui.set_private(True)
+                export_ui.set_static(True)
             
-            item_name = selection_list[i].get_full_name()
-            ix.selection.add(item_name)
+            for i in range(len(selection_list)):
+                ix.selection.deselect_all()
+                
+                item_name = selection_list[i].get_full_name()
+                ix.selection.add(item_name)
 
-            usd_file_path = '{0}{1}.usd'.format(root_dir, usdLayoutList.get_item_name(i))
-            export_ui.get_attribute('filename').set_string(usd_file_path)
-            export_ui.call_action("export_context")
+                usd_file_path = '{0}{1}.usd'.format(root_dir, usdLayoutList.get_item_name(i))
+                export_ui.get_attribute('filename').set_string(usd_file_path)
+                export_ui.call_action("export_context")
 
-            print('usd export ----------- {0:04d}/{1:04d}'.format(i+1, len(selection_list)))
+                print('usd export ----------- {0:04d}/{1:04d}'.format(i+1, len(selection_list)))
 
-            export_ui.get_attribute('filename').set_string('')
-            ix.selection.deselect_all()
+                export_ui.get_attribute('filename').set_string('')
+                ix.selection.deselect_all()
 
-        print('usd exporting is done')
+            print('usd exporting is done')
+        else:
+            print('path is empty')
 
     def CloseWindow(self, sender, evtid):
         sender.get_window().hide()
